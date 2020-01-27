@@ -1,0 +1,263 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>ScriptSolveForFixedSpectrum</title><meta name="generator" content="MATLAB 8.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-10-12"><meta name="DC.source" content="ScriptSolveForFixedSpectrum.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>ScriptSolveForFixedSpectrum</h1><!--introduction--><p>An example script showing how to obtain the field expansion coefficients and far-field cross-sections for a spheroid in a fixed orientation, as a function of wavelength. Plots the wavelength-dependent spectra for extinction, scattering, and absorption cross-sections for fixed orientation, as well as orientation-averaged.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Instructions</a></li><li><a href="#3">Parameters of the scattering problem</a></li><li><a href="#4">Convergence parameters</a></li><li><a href="#5">Collect simulation parameters in a structure</a></li><li><a href="#6">T-matrix calculation</a></li><li><a href="#7">Convergence test</a></li><li><a href="#8">Plotting the results</a></li></ul></div><h2>Instructions<a name="1"></a></h2><p>Note that you need to run InitPath in the root folder first to add required folders to the Matlab path so that functions can be called Alternatively, uncomment the following line</p><pre class="language-matlab">run(<span class="string">'..\InitPath'</span>);
+</pre><p>The following parameters should be defined:</p><div><ul><li>a: semi-axis along x,y</li><li>c: semi-axis along z</li><li>N: number of multipoles for T-matrix</li><li>nNbTheta: number of thetas for quadratures</li><li>lambda: wavelength (in same unit as a and c)</li><li>k1: wavevector in embedding medium (of refractive index nM) (k1=2*pi*nM/lambda)</li><li>s: relative refractive index (s=n_Particle / nM) lambda, k1, and s must here be wavelength-dependent vectors [L x 1]</li><li>sIncType: string such a 'KxEz' defining the incident field)</li><li>or stIncPar: struct defining the incident field (alternative       to sIncType)</li></ul></div><pre class="codeinput">clear <span class="string">all</span>
+close <span class="string">all</span>
+</pre><h2>Parameters of the scattering problem<a name="3"></a></h2><p>We define parameters for a gold nanorod in water, modeled as a prolate spheroid</p><p><img vspace="5" hspace="5" src="../fig/schematicp.png" alt=""> </p><pre class="codeinput">a = 15; <span class="comment">% in nm</span>
+c = 45; <span class="comment">% in nm, i.e. 30 x 90nm full-axes</span>
+lambda = (400:5:1100).'; <span class="comment">% in nm</span>
+epsilon2 = epsAu(lambda);
+epsilon1 = 1.33^2; <span class="comment">% for water</span>
+<span class="comment">% Define incident field along main axis</span>
+sIncType = <span class="string">'KxEz'</span>;
+</pre><h2>Convergence parameters<a name="4"></a></h2><p>Maximum multipole order for T-matrix and series expansions of fields</p><pre class="codeinput">N = 20;
+<span class="comment">% Number of points for Gaussian quadratures to compute integrals in P and Q matrices</span>
+nNbTheta = 50;
+</pre><h2>Collect simulation parameters in a structure<a name="5"></a></h2><pre class="codeinput">k1 = 2*pi./lambda * sqrt(epsilon1);
+s = sqrt(epsilon2)/sqrt(epsilon1);
+
+stParams.a=a; stParams.c=c;
+stParams.k1=k1; stParams.s=s;
+stParams.N=N; stParams.nNbTheta=nNbTheta;
+stParams.lambda=lambda;
+stParams.epsilon2=epsilon2;
+stParams.epsilon1=epsilon1;
+stParams.sIncType = sIncType;
+
+<span class="comment">% Optional parameters may also be defined as follows:</span>
+stOptions.bGetR = false;
+stOptions.Delta = 0;
+stOptions.NB = 0; <span class="comment">% NB will be estimated automatically</span>
+stOptions.bGetSymmetricT = false;
+stOptions.bOutput = false; <span class="comment">% suppress messages in lambda-loop</span>
+</pre><h2>T-matrix calculation<a name="6"></a></h2><p>Solve for T (all wavelengths)</p><pre class="codeinput">tic;
+stC = slvForFixedSpectrum(stParams,stOptions);
+fprintf(<span class="string">'\nT-matrix (N = %d) ... done in %.2f seconds.\n'</span>, N, toc);
+<span class="comment">% use this call instead to keep the expansion coefficients for further</span>
+<span class="comment">% processing</span>
+<span class="comment">%[stC, stAbcdnm] = slvForT(stParams,stOptions);</span>
+</pre><pre class="codeoutput">
+Loop over 141 lambda values...
+
+T-matrix (N = 20) ... done in 22.92 seconds.
+</pre><h2>Convergence test<a name="7"></a></h2><p>To test for convergence and accuracy, we choose the wavelength with the largest k1|s| and repeat the calculation with N=N+5 and nNbTheta=nNbTheta+5</p><pre class="codeinput">[~,indWorst]=max(abs(stParams.k1 .* stParams.s));
+stParams2 = pstGetParamsStructOneLambda(stParams,lambda(indWorst));
+stParams2.N=stParams2.N+5;
+stParams2.nNbTheta=stParams2.nNbTheta+5;
+fprintf(<span class="string">'\nConvergence testing for lambda = %.2f.\n'</span>, lambda(indWorst));
+tic;
+stC2 = slvForFixed(stParams2,stOptions);
+fprintf(<span class="string">'\nT-matrix (N = %d) ... done in %.2f seconds.\n\n'</span>, N, toc);
+
+<span class="comment">% relative errors</span>
+relerrExt = (abs(stC.Cext(indWorst)./stC2.Cext-1));
+relerrSca = (abs(stC.Csca(indWorst)./stC2.Csca-1));
+relerrAbs = (abs(stC.Cabs(indWorst)./stC2.Cabs-1));
+relerrExtoa = (abs(stC.Cextoa(indWorst)./stC2.Cextoa-1));
+relerrScaoa = (abs(stC.Cscaoa(indWorst)./stC2.Cscaoa-1));
+relerrAbsoa = (abs(stC.Cabsoa(indWorst)./stC2.Cabsoa-1));
+</pre><pre class="codeoutput">
+Convergence testing for lambda = 1100.00.
+
+T-matrix (N = 20) ... done in 0.37 seconds.
+
+</pre><h2>Plotting the results<a name="8"></a></h2><pre class="codeinput">figure(<span class="string">'Name'</span>,<span class="string">'ScriptSolveForFixedSpectrum'</span>);
+plot(lambda,[stC.Cext,stC.Csca,stC.Cabs,stC.Cextoa,stC.Cscaoa,stC.Cabsoa]);
+legend({[<span class="string">'Cext (err. '</span>, num2str(relerrExt,3),<span class="string">')'</span>], <span class="keyword">...</span>
+    [<span class="string">'Csca (err. '</span>, num2str(relerrSca,3),<span class="string">')'</span>], <span class="keyword">...</span>
+    [<span class="string">'Cabs (err. '</span>, num2str(relerrAbs,3),<span class="string">')'</span>], <span class="keyword">...</span>
+    [<span class="string">'&lt;Cext&gt; (err. '</span>, num2str(relerrExtoa,3),<span class="string">')'</span>], <span class="keyword">...</span>
+    [<span class="string">'&lt;Csca&gt; (err. '</span>, num2str(relerrScaoa,3),<span class="string">')'</span>], <span class="keyword">...</span>
+    [<span class="string">'&lt;Cabs&gt; (err. '</span>, num2str(relerrAbsoa,3),<span class="string">')'</span>]}, <span class="keyword">...</span>
+    <span class="string">'Location'</span>,<span class="string">'Best'</span>);
+title([<span class="string">'a='</span>, num2str(a), <span class="string">', c='</span>,num2str(c),<span class="string">', N='</span>, int2str(N), <span class="string">', Nt='</span>, int2str(nNbTheta)]);
+xlabel(<span class="string">'Wavelength [nm]'</span>) <span class="comment">% x-axis label</span>
+ylabel(<span class="string">'Cross-section [nm^2]'</span>) <span class="comment">% y-axis label</span>
+</pre><img vspace="5" hspace="5" src="ScriptSolveForFixedSpectrum_01.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% ScriptSolveForFixedSpectrum
+% An example script showing how to obtain the field expansion coefficients
+% and far-field cross-sections for a spheroid in a fixed orientation, as a
+% function of wavelength. 
+% Plots the wavelength-dependent spectra for extinction, scattering, and
+% absorption cross-sections for fixed orientation, as well as
+% orientation-averaged.
+%%
+
+%% Instructions
+%
+% Note that you need to run InitPath in the root folder first to add
+% required folders to the Matlab path so that functions can be called
+% Alternatively, uncomment the following line
+%
+%   run('..\InitPath');
+% 
+% The following parameters should be defined:
+%%
+% * a: semi-axis along x,y
+% * c: semi-axis along z
+% * N: number of multipoles for T-matrix
+% * nNbTheta: number of thetas for quadratures
+% * lambda: wavelength (in same unit as a and c)
+% * k1: wavevector in embedding medium (of refractive index nM) (k1=2*pi*nM/lambda)
+% * s: relative refractive index (s=n_Particle / nM)
+% lambda, k1, and s must here be wavelength-dependent vectors [L x 1]
+% * sIncType: string such a 'KxEz' defining the incident field)
+% * or stIncPar: struct defining the incident field (alternative
+%       to sIncType)
+
+clear all
+close all
+
+%% Parameters of the scattering problem
+% We define parameters for a gold nanorod in water, modeled as a prolate
+% spheroid
+% 
+% <<../fig/schematicp.png>>
+% 
+a = 15; % in nm
+c = 45; % in nm, i.e. 30 x 90nm full-axes
+lambda = (400:5:1100).'; % in nm
+epsilon2 = epsAu(lambda);
+epsilon1 = 1.33^2; % for water
+% Define incident field along main axis
+sIncType = 'KxEz';
+
+%% Convergence parameters
+% Maximum multipole order for T-matrix and series expansions of fields
+N = 20;
+% Number of points for Gaussian quadratures to compute integrals in P and Q matrices
+nNbTheta = 50;
+
+%% Collect simulation parameters in a structure
+k1 = 2*pi./lambda * sqrt(epsilon1);
+s = sqrt(epsilon2)/sqrt(epsilon1);
+
+stParams.a=a; stParams.c=c;
+stParams.k1=k1; stParams.s=s;
+stParams.N=N; stParams.nNbTheta=nNbTheta;
+stParams.lambda=lambda;
+stParams.epsilon2=epsilon2;
+stParams.epsilon1=epsilon1;
+stParams.sIncType = sIncType;
+
+% Optional parameters may also be defined as follows:
+stOptions.bGetR = false;
+stOptions.Delta = 0;
+stOptions.NB = 0; % NB will be estimated automatically
+stOptions.bGetSymmetricT = false;
+stOptions.bOutput = false; % suppress messages in lambda-loop
+
+
+%% T-matrix calculation 
+% Solve for T (all wavelengths)
+tic;
+stC = slvForFixedSpectrum(stParams,stOptions);
+fprintf('\nT-matrix (N = %d) ... done in %.2f seconds.\n', N, toc);
+% use this call instead to keep the expansion coefficients for further
+% processing
+%[stC, stAbcdnm] = slvForT(stParams,stOptions);
+
+%% Convergence test
+% To test for convergence and accuracy, we choose the wavelength with the largest
+% k1|s| and repeat the calculation with N=N+5 and nNbTheta=nNbTheta+5
+[~,indWorst]=max(abs(stParams.k1 .* stParams.s));
+stParams2 = pstGetParamsStructOneLambda(stParams,lambda(indWorst));
+stParams2.N=stParams2.N+5;
+stParams2.nNbTheta=stParams2.nNbTheta+5;
+fprintf('\nConvergence testing for lambda = %.2f.\n', lambda(indWorst));
+tic;
+stC2 = slvForFixed(stParams2,stOptions);
+fprintf('\nT-matrix (N = %d) ... done in %.2f seconds.\n\n', N, toc);
+
+% relative errors
+relerrExt = (abs(stC.Cext(indWorst)./stC2.Cext-1));
+relerrSca = (abs(stC.Csca(indWorst)./stC2.Csca-1));
+relerrAbs = (abs(stC.Cabs(indWorst)./stC2.Cabs-1));
+relerrExtoa = (abs(stC.Cextoa(indWorst)./stC2.Cextoa-1));
+relerrScaoa = (abs(stC.Cscaoa(indWorst)./stC2.Cscaoa-1));
+relerrAbsoa = (abs(stC.Cabsoa(indWorst)./stC2.Cabsoa-1));
+
+%% Plotting the results
+figure('Name','ScriptSolveForFixedSpectrum');
+plot(lambda,[stC.Cext,stC.Csca,stC.Cabs,stC.Cextoa,stC.Cscaoa,stC.Cabsoa]);
+legend({['Cext (err. ', num2str(relerrExt,3),')'], ...
+    ['Csca (err. ', num2str(relerrSca,3),')'], ...
+    ['Cabs (err. ', num2str(relerrAbs,3),')'], ...
+    ['<Cext> (err. ', num2str(relerrExtoa,3),')'], ...
+    ['<Csca> (err. ', num2str(relerrScaoa,3),')'], ...
+    ['<Cabs> (err. ', num2str(relerrAbsoa,3),')']}, ...
+    'Location','Best');
+title(['a=', num2str(a), ', c=',num2str(c),', N=', int2str(N), ', Nt=', int2str(nNbTheta)]);
+xlabel('Wavelength [nm]') % x-axis label
+ylabel('Cross-section [nm^2]') % y-axis label
+
+
+##### SOURCE END #####
+--></body></html>

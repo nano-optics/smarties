@@ -1,0 +1,297 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>ScriptSolveForNearFieldSpectrum</title><meta name="generator" content="MATLAB 8.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-10-12"><meta name="DC.source" content="ScriptSolveForNearFieldSpectrum.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>ScriptSolveForNearFieldSpectrum</h1><!--introduction--><p>An example script showing how to obtain the field expansion coefficients, far-field cross-sections and surface field properties for a spheroid in fixed orientation, as a function of wavelength. Plots the wavelength-dependent spectra for extinction, scattering, and absorption cross-sections (fixed orientation as well as orientation-averaged), along with lambda-dependent surface-averaged surface field properties.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Initialization</a></li><li><a href="#3">Parameters of the scattering problem</a></li><li><a href="#4">Convergence parameters</a></li><li><a href="#5">Collect simulation parameters in a structure</a></li><li><a href="#6">Solving for the T-matrix (all wavelengths)</a></li><li><a href="#7">Plotting the results</a></li></ul></div><h2>Initialization<a name="1"></a></h2><p>Note that you need to run InitPath in the root folder first to add required folders to the Matlab path so that functions can be called Alternatively, uncomment the following line</p><pre class="language-matlab">run(<span class="string">'..\InitPath'</span>);
+</pre><p>The following parameters should be defined:</p><div><ul><li>a: semi-axis along x,y</li><li>c: semi-axis along z</li><li>N: number of multipoles for T-matrix</li><li>nNbTheta: number of thetas for quadratures</li><li>lambda: wavelength (in same unit as a and c)</li><li>k1: wavevector in embedding medium (of refractive index nM) (k1=2*pi*nM/lambda)</li><li>s: relative refractive index (s=n_Particle / nM) lambda, k1, and s must be vectors of identical size [L x 1]</li></ul></div><pre class="codeinput">clear <span class="string">all</span>
+close <span class="string">all</span>
+</pre><h2>Parameters of the scattering problem<a name="3"></a></h2><p>We define parameters for a gold nanorod in water, modeled as a prolate spheroid</p><p><img vspace="5" hspace="5" src="../fig/schematicp.png" alt=""> </p><pre class="codeinput">a = 15; <span class="comment">% in nm</span>
+c = 45; <span class="comment">% in nm, i.e. 30 x 90nm full-axes</span>
+lambda = (400:5:900).'; <span class="comment">% in nm</span>
+epsilon2 = epsAu(lambda);
+epsilon1 = 1.33^2; <span class="comment">% for water</span>
+<span class="comment">% Define incident excitation along main axis</span>
+sIncType = <span class="string">'KxEz'</span>;
+</pre><h2>Convergence parameters<a name="4"></a></h2><pre class="codeinput"><span class="comment">% Maximum multipole order for T-matrix and series expansions of fields</span>
+N = 20;
+<span class="comment">% Number of points for Gaussian quadratures to compute integrals in P and Q matrices</span>
+nNbTheta = 50;
+<span class="comment">% Number of points for post-processing (computing the surface field averages)</span>
+nNbThetaPst = 360;
+</pre><h2>Collect simulation parameters in a structure<a name="5"></a></h2><pre class="codeinput">k1 = 2*pi./lambda * sqrt(epsilon1);
+s = sqrt(epsilon2)/sqrt(epsilon1);
+
+stParams.a=a; stParams.c=c;
+stParams.k1=k1; stParams.s=s;
+stParams.N=N; stParams.nNbTheta=nNbTheta;
+stParams.lambda=lambda;
+stParams.sIncType = sIncType;
+
+<span class="comment">% For surface fields, the following parameters are also needed:</span>
+stParams.epsilon2= epsilon2;
+stParams.epsilon1= epsilon1;
+stParams.nNbThetaPst = nNbThetaPst;
+
+<span class="comment">% Optional parameters may also be defined as follows:</span>
+stOptions.bGetR = true; <span class="comment">% This is needed for near fields and will be overridden in any case</span>
+stOptions.Delta = 0; <span class="comment">% Use Delta=-1 to estimate Delta automatically</span>
+stOptions.NB = 0; <span class="comment">% NB will be estimated automatically</span>
+stOptions.bGetSymmetricT = false;
+stOptions.bOutput = false; <span class="comment">% false to suppress messages in lambda-loop</span>
+</pre><h2>Solving for the T-matrix (all wavelengths)<a name="6"></a></h2><pre class="codeinput">tic;
+[stC, stAbcdnm, stEsurf] = slvForNearFieldSpectrum(stParams,stOptions);
+
+fprintf(<span class="string">'\nT/R-matrices and near fields (N = %d) ... done in %.g seconds.\n'</span>, N, toc);
+
+<span class="comment">% To test for convergence and accuracy, we choose the wavelength with the largest</span>
+<span class="comment">% k1|s| and repeat the calculation with N=N+5 and nNbTheta=nNbTheta+5</span>
+[~,indWorst]=max(abs(stParams.k1 .* stParams.s));
+stParams2 = pstGetParamsStructOneLambda(stParams,lambda(indWorst));
+stParams2.N=stParams2.N+5;
+stParams2.nNbTheta=stParams2.nNbTheta+5;
+ <span class="comment">% Also add more theta to post-processing to test accuracy of surface averages</span>
+stParams2.nNbThetaPst=stParams2.nNbThetaPst+5;
+fprintf(<span class="string">'Convergence testing for lambda = %.f\n'</span>, lambda(indWorst));
+tic;
+[stC2, stAbcdnm2, stEsurf2] = slvForNearField(stParams2,stOptions);
+relerrExt = (abs(stC.Cext(indWorst)./stC2.Cext-1));
+relerrSca = (abs(stC.Csca(indWorst)./stC2.Csca-1));
+relerrAbs = (abs(stC.Cabs(indWorst)./stC2.Cabs-1));
+relerrExtoa = (abs(stC.Cextoa(indWorst)./stC2.Cextoa-1));
+relerrScaoa = (abs(stC.Cscaoa(indWorst)./stC2.Cscaoa-1));
+relerrAbsoa = (abs(stC.Cabsoa(indWorst)./stC2.Cabsoa-1));
+relerrM = (abs(stEsurf.MLocAve(indWorst)./stEsurf2.MLocAve-1));
+relerrMperp = (abs(stEsurf.MLocPerpAve(indWorst)./stEsurf2.MLocPerpAve-1));
+relerrF = (abs(stEsurf.F0E4Ave(indWorst)./stEsurf2.F0E4Ave-1));
+fprintf(<span class="string">'\nT-matrix (N = %d) ... done in %.g seconds.\n'</span>, N, toc);
+</pre><pre class="codeoutput">
+Loop over 101 lambda values...
+Calculating surface-fields for all wavelengths...
+ ... done in 7.8509 seconds.
+
+T/R-matrices and near fields (N = 20) ... done in 8 seconds.
+Convergence testing for lambda = 900
+
+T-matrix (N = 20) ... done in 0.6 seconds.
+</pre><h2>Plotting the results<a name="7"></a></h2><pre class="codeinput">fh = figure(<span class="string">'Name'</span>,<span class="string">'ScriptSolveForNearFieldSpectrum'</span>);
+set(fh, <span class="string">'Position'</span>, [100, 100, 1000, 500]);
+subplot(1,2,1)
+plot(lambda,[stC.Cext,stC.Csca,stC.Cabs,stC.Cextoa,stC.Cscaoa,stC.Cabsoa]);
+legend({[<span class="string">'Cext   (err. '</span>, num2str(relerrExt,3),<span class="string">')'</span>], <span class="keyword">...</span>
+    [<span class="string">'Csca   (err. '</span>, num2str(relerrSca,3),<span class="string">')'</span>], <span class="keyword">...</span>
+    [<span class="string">'Cabs   (err. '</span>, num2str(relerrAbs,3),<span class="string">')'</span>], <span class="keyword">...</span>
+    [<span class="string">'&lt;Cext&gt; (err. '</span>, num2str(relerrExtoa,3),<span class="string">')'</span>], <span class="keyword">...</span>
+    [<span class="string">'&lt;Csca&gt; (err. '</span>, num2str(relerrScaoa,3),<span class="string">')'</span>], <span class="keyword">...</span>
+    [<span class="string">'&lt;Cabs&gt; (err. '</span>, num2str(relerrAbsoa,3),<span class="string">')'</span>]}, <span class="keyword">...</span>
+    <span class="string">'Location'</span>,<span class="string">'Best'</span>);
+title([<span class="string">'a='</span>, num2str(a), <span class="string">', c='</span>,num2str(c),<span class="string">', N='</span>, int2str(N), <span class="string">', Nt='</span>, int2str(nNbTheta)]);
+xlabel(<span class="string">'Wavelength [nm]'</span>)
+ylabel(<span class="string">'Cross-section [nm^2]'</span>)
+
+subplot(1,2,2)
+semilogy(lambda,[stEsurf.MLocAve,stEsurf.MLocPerpAve,stEsurf.F0E4Ave]);
+legend({[<span class="string">'&lt;|E|^2&gt;        (err. '</span>, num2str(relerrM,3),<span class="string">')'</span>], <span class="keyword">...</span>
+    [<span class="string">'&lt;|E_{perp}|^2&gt; (err. '</span>, num2str(relerrMperp,3),<span class="string">')'</span>], <span class="keyword">...</span>
+    [<span class="string">'&lt;|E|^4&gt;        (err. '</span>, num2str(relerrF,3),<span class="string">')'</span>]}, <span class="keyword">...</span>
+    <span class="string">'Location'</span>,<span class="string">'Best'</span>);
+title(<span class="string">'Surface-averaged surface field properties'</span>);
+xlabel(<span class="string">'Wavelength [nm]'</span>)
+ylabel(<span class="string">'Field Enhancement Factor'</span>)
+</pre><img vspace="5" hspace="5" src="ScriptSolveForNearFieldSpectrum_01.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% ScriptSolveForNearFieldSpectrum
+% An example script showing how to obtain the field expansion coefficients,
+% far-field cross-sections and surface field properties for a spheroid in
+% fixed orientation, as a function of wavelength.
+% Plots the wavelength-dependent spectra for extinction, scattering, and
+% absorption cross-sections (fixed orientation as well as orientation-averaged),
+% along with lambda-dependent surface-averaged surface field properties.
+%%
+
+%% Initialization
+%
+% Note that you need to run InitPath in the root folder first to add
+% required folders to the Matlab path so that functions can be called
+% Alternatively, uncomment the following line
+%
+%   run('..\InitPath');
+%
+% The following parameters should be defined:
+%%
+% * a: semi-axis along x,y
+% * c: semi-axis along z
+% * N: number of multipoles for T-matrix
+% * nNbTheta: number of thetas for quadratures
+% * lambda: wavelength (in same unit as a and c)
+% * k1: wavevector in embedding medium (of refractive index nM) (k1=2*pi*nM/lambda)
+% * s: relative refractive index (s=n_Particle / nM)
+% lambda, k1, and s must be vectors of identical size [L x 1]
+
+clear all
+close all
+
+%% Parameters of the scattering problem
+% We define parameters for a gold nanorod in water, modeled as a prolate
+% spheroid
+%
+% <<../fig/schematicp.png>>
+%
+a = 15; % in nm
+c = 45; % in nm, i.e. 30 x 90nm full-axes
+lambda = (400:5:900).'; % in nm
+epsilon2 = epsAu(lambda);
+epsilon1 = 1.33^2; % for water
+% Define incident excitation along main axis
+sIncType = 'KxEz';
+
+%% Convergence parameters
+
+% Maximum multipole order for T-matrix and series expansions of fields
+N = 20;
+% Number of points for Gaussian quadratures to compute integrals in P and Q matrices
+nNbTheta = 50;
+% Number of points for post-processing (computing the surface field averages)
+nNbThetaPst = 360;
+
+%% Collect simulation parameters in a structure
+k1 = 2*pi./lambda * sqrt(epsilon1);
+s = sqrt(epsilon2)/sqrt(epsilon1);
+
+stParams.a=a; stParams.c=c;
+stParams.k1=k1; stParams.s=s;
+stParams.N=N; stParams.nNbTheta=nNbTheta;
+stParams.lambda=lambda;
+stParams.sIncType = sIncType;
+
+% For surface fields, the following parameters are also needed:
+stParams.epsilon2= epsilon2;
+stParams.epsilon1= epsilon1;
+stParams.nNbThetaPst = nNbThetaPst;
+
+% Optional parameters may also be defined as follows:
+stOptions.bGetR = true; % This is needed for near fields and will be overridden in any case
+stOptions.Delta = 0; % Use Delta=-1 to estimate Delta automatically
+stOptions.NB = 0; % NB will be estimated automatically
+stOptions.bGetSymmetricT = false;
+stOptions.bOutput = false; % false to suppress messages in lambda-loop
+
+%% Solving for the T-matrix (all wavelengths)
+tic;
+[stC, stAbcdnm, stEsurf] = slvForNearFieldSpectrum(stParams,stOptions);
+
+fprintf('\nT/R-matrices and near fields (N = %d) ... done in %.g seconds.\n', N, toc);
+
+% To test for convergence and accuracy, we choose the wavelength with the largest
+% k1|s| and repeat the calculation with N=N+5 and nNbTheta=nNbTheta+5
+[~,indWorst]=max(abs(stParams.k1 .* stParams.s));
+stParams2 = pstGetParamsStructOneLambda(stParams,lambda(indWorst));
+stParams2.N=stParams2.N+5;
+stParams2.nNbTheta=stParams2.nNbTheta+5;
+ % Also add more theta to post-processing to test accuracy of surface averages
+stParams2.nNbThetaPst=stParams2.nNbThetaPst+5;
+fprintf('Convergence testing for lambda = %.f\n', lambda(indWorst));
+tic;
+[stC2, stAbcdnm2, stEsurf2] = slvForNearField(stParams2,stOptions);
+relerrExt = (abs(stC.Cext(indWorst)./stC2.Cext-1));
+relerrSca = (abs(stC.Csca(indWorst)./stC2.Csca-1));
+relerrAbs = (abs(stC.Cabs(indWorst)./stC2.Cabs-1));
+relerrExtoa = (abs(stC.Cextoa(indWorst)./stC2.Cextoa-1));
+relerrScaoa = (abs(stC.Cscaoa(indWorst)./stC2.Cscaoa-1));
+relerrAbsoa = (abs(stC.Cabsoa(indWorst)./stC2.Cabsoa-1));
+relerrM = (abs(stEsurf.MLocAve(indWorst)./stEsurf2.MLocAve-1));
+relerrMperp = (abs(stEsurf.MLocPerpAve(indWorst)./stEsurf2.MLocPerpAve-1));
+relerrF = (abs(stEsurf.F0E4Ave(indWorst)./stEsurf2.F0E4Ave-1));
+fprintf('\nT-matrix (N = %d) ... done in %.g seconds.\n', N, toc);
+
+%% Plotting the results
+fh = figure('Name','ScriptSolveForNearFieldSpectrum');
+set(fh, 'Position', [100, 100, 1000, 500]);
+subplot(1,2,1)
+plot(lambda,[stC.Cext,stC.Csca,stC.Cabs,stC.Cextoa,stC.Cscaoa,stC.Cabsoa]);
+legend({['Cext   (err. ', num2str(relerrExt,3),')'], ...
+    ['Csca   (err. ', num2str(relerrSca,3),')'], ...
+    ['Cabs   (err. ', num2str(relerrAbs,3),')'], ...
+    ['<Cext> (err. ', num2str(relerrExtoa,3),')'], ...
+    ['<Csca> (err. ', num2str(relerrScaoa,3),')'], ...
+    ['<Cabs> (err. ', num2str(relerrAbsoa,3),')']}, ...
+    'Location','Best');
+title(['a=', num2str(a), ', c=',num2str(c),', N=', int2str(N), ', Nt=', int2str(nNbTheta)]);
+xlabel('Wavelength [nm]')
+ylabel('Cross-section [nm^2]')
+
+subplot(1,2,2)
+semilogy(lambda,[stEsurf.MLocAve,stEsurf.MLocPerpAve,stEsurf.F0E4Ave]);
+legend({['<|E|^2>        (err. ', num2str(relerrM,3),')'], ...
+    ['<|E_{perp}|^2> (err. ', num2str(relerrMperp,3),')'], ...
+    ['<|E|^4>        (err. ', num2str(relerrF,3),')']}, ...
+    'Location','Best');
+title('Surface-averaged surface field properties');
+xlabel('Wavelength [nm]')
+ylabel('Field Enhancement Factor')
+
+##### SOURCE END #####
+--></body></html>

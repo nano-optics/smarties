@@ -1,0 +1,244 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>ScriptSolveForFixed</title><meta name="generator" content="MATLAB 8.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-10-12"><meta name="DC.source" content="ScriptSolveForFixed.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>ScriptSolveForFixed</h1><!--introduction--><p>An example script showing how to obtain the field expansion coefficients and far-field cross-sections for a spheroid at a single wavelength, and fixed orientation. Outputs the far-field cross-sections with accuracy estimates.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Instructions</a></li><li><a href="#3">Parameters of the scattering problem</a></li><li><a href="#4">Convergence parameters</a></li><li><a href="#5">Collect simulation parameters in a structure</a></li><li><a href="#6">Optional control parameters</a></li><li><a href="#7">T-matrix calculation</a></li></ul></div><h2>Instructions<a name="1"></a></h2><p>Note that you need to run InitPath in the root folder first to add required folders to the Matlab path so that functions can be called Alternatively, uncomment the following line</p><pre class="language-matlab">run(<span class="string">'..\InitPath'</span>);
+</pre><p>The following parameters should be defined:</p><div><ul><li>a: semi-axis along x,y</li><li>c: semi-axis along z</li><li>k1: wavevector in embedding medium (of refractive index nM) (k1=2*pi*nM/lambda)</li><li>s: relative refractive index (s=n_Particle / nM)</li><li>N: number of multipoles for T-matrix</li><li>nNbTheta: number of thetas for quadratures</li><li>sIncType: string such a 'KxEz' defining the incident field</li><li>or stIncPar: struct defining the incident field (alternative to sIncType)</li></ul></div><pre class="codeinput">clear <span class="string">all</span>
+close <span class="string">all</span>
+</pre><h2>Parameters of the scattering problem<a name="3"></a></h2><p>We define parameters for a gold nanorod in water, modeled as a prolate spheroid</p><p><img vspace="5" hspace="5" src="../fig/schematicp.png" alt=""> </p><pre class="codeinput">a = 10; <span class="comment">% short semi-axis in nm</span>
+c = 50; <span class="comment">% long semi-axis in nm</span>
+lambda = 650; <span class="comment">% wavelength in nm</span>
+epsilon2 = epsAu(lambda); <span class="comment">% dielectric function of particle</span>
+epsilon1 = 1.33^2; <span class="comment">% dielectric constant of embedding medium (water)</span>
+<span class="comment">% Incident excitation polarised along main axis</span>
+sIncType = <span class="string">'KxEz'</span>;
+</pre><h2>Convergence parameters<a name="4"></a></h2><pre class="codeinput"><span class="comment">% Maximum multipole order for T-matrix and series expansions of fields</span>
+N = 40;
+<span class="comment">% Number of points for Gaussian quadratures to compute integrals in P and Q matrices</span>
+nNbTheta = 120;
+</pre><h2>Collect simulation parameters in a structure<a name="5"></a></h2><pre class="codeinput">k1 = 2*pi/lambda * sqrt(epsilon1);
+s = sqrt(epsilon2)/sqrt(epsilon1);
+
+stParams.a=a; stParams.c=c;
+stParams.k1=k1; stParams.s=s;
+stParams.N=N; stParams.nNbTheta=nNbTheta;
+stParams.sIncType = sIncType;
+</pre><h2>Optional control parameters<a name="6"></a></h2><pre class="codeinput">stOptions.bGetR = false;
+stOptions.Delta = 0;
+stOptions.NB = 0; <span class="comment">% NB will be estimated automatically</span>
+stOptions.bGetSymmetricT = false;
+</pre><h2>T-matrix calculation<a name="7"></a></h2><pre class="codeinput">tic; <span class="comment">% timer</span>
+<span class="comment">% Solve for T-matrix</span>
+stC = slvForFixed(stParams, stOptions);
+<span class="comment">% use this call instead to keep the expansion coefficients for further</span>
+<span class="comment">% processing</span>
+<span class="comment">% [stC, stAbcdnm] = slvForT(stParams,stOptions);</span>
+
+fprintf(<span class="string">'T-matrix (N = %d) ... done in %.f seconds.\n'</span>, N, toc);
+
+<span class="comment">% To test for convergence and accuracy for a given set of parameters, one</span>
+<span class="comment">% can for example repeat the calculation with N=N+5 and nNbTheta=nNbTheta+5</span>
+<span class="comment">% as illustrated below</span>
+fprintf(<span class="string">'Convergence testing...\n'</span>);
+tic;
+stParams2=stParams;
+stParams2.N=stParams2.N+5;
+stParams2.nNbTheta=stParams2.nNbTheta+5;
+[stC2, ~] = slvForFixed(stParams2, stOptions);
+
+fprintf(<span class="string">'\nT-matrix (N = %d) ... done in %.f seconds.\n\n'</span>, N, toc);
+fprintf(<span class="string">'Results for a=%g, c=%g, k1=%g, s=%g+%gi, N=%d, Nt=%d\n'</span>,<span class="keyword">...</span>
+        a, c, k1, real(s),imag(s), N, nNbTheta);
+
+fprintf(<span class="string">'\nCross sections for fixed excitation (and estimated accuracy):\n'</span>);
+fprintf(<span class="string">'Cext = %.20g,   relative error: %.5g\n'</span>, stC.Cext, abs(stC.Cext./stC2.Cext-1));
+fprintf(<span class="string">'Csca = %.20g,   relative error: %.5g\n'</span>, stC.Csca, abs(stC.Csca./stC2.Csca-1));
+fprintf(<span class="string">'Cabs = %.20g,   relative error: %.5g\n'</span>, stC.Cabs, abs(stC.Cabs./stC2.Cabs-1));
+fprintf(<span class="string">'\nCross sections for orientation-averaged excitation (and estimated accuracy):\n'</span>);
+fprintf(<span class="string">'&lt;Cext&gt; = %.20g,   relative error: %.5g\n'</span>, stC.Cextoa, abs(stC.Cextoa./stC2.Cextoa-1));
+fprintf(<span class="string">'&lt;Csca&gt; = %.20g,   relative error: %.5g\n'</span>, stC.Cscaoa, abs(stC.Cscaoa./stC2.Cscaoa-1));
+fprintf(<span class="string">'&lt;Cabs&gt; = %.20g,   relative error: %.5g\n'</span>, stC.Cabsoa, abs(stC.Cabsoa./stC2.Cabsoa-1));
+</pre><pre class="codeoutput">sphCalculatePQ: Calculating P,Q for 41 m-values with N_Q = 40, N_B = 41, N_Theta = 120
+T-matrix (N = 40) ... done in 2 seconds.
+Convergence testing...
+sphCalculatePQ: Calculating P,Q for 46 m-values with N_Q = 45, N_B = 45, N_Theta = 125
+
+T-matrix (N = 40) ... done in 2 seconds.
+
+Results for a=10, c=50, k1=0.0128564, s=0.119065+2.67664i, N=40, Nt=120
+
+Cross sections for fixed excitation (and estimated accuracy):
+Cext = 509.7977525837234225,   relative error: 3.6637e-15
+Csca = 99.483485613090834931,   relative error: 1.6653e-15
+Cabs = 410.31426697063261599,   relative error: 4.1078e-15
+
+Cross sections for orientation-averaged excitation (and estimated accuracy):
+&lt;Cext&gt; = 249.93383391529411597,   relative error: 1.7208e-14
+&lt;Csca&gt; = 36.305224719494638919,   relative error: 2.8866e-15
+&lt;Cabs&gt; = 213.62860919579946994,   relative error: 1.9651e-14
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% ScriptSolveForFixed
+% An example script showing how to obtain the field expansion coefficients
+% and far-field cross-sections for a spheroid at a single wavelength, and fixed orientation.
+% Outputs the far-field cross-sections with accuracy estimates.
+%%
+
+%% Instructions
+%
+% Note that you need to run InitPath in the root folder first to add
+% required folders to the Matlab path so that functions can be called
+% Alternatively, uncomment the following line
+%
+%   run('..\InitPath');
+%
+% The following parameters should be defined:
+%%
+% * a: semi-axis along x,y
+% * c: semi-axis along z
+% * k1: wavevector in embedding medium (of refractive index nM) (k1=2*pi*nM/lambda)
+% * s: relative refractive index (s=n_Particle / nM)
+% * N: number of multipoles for T-matrix
+% * nNbTheta: number of thetas for quadratures
+% * sIncType: string such a 'KxEz' defining the incident field
+% * or stIncPar: struct defining the incident field (alternative to sIncType)
+
+clear all
+close all
+
+%% Parameters of the scattering problem
+% We define parameters for a gold nanorod in water, modeled as a prolate
+% spheroid
+%
+% <<../fig/schematicp.png>>
+%
+a = 10; % short semi-axis in nm
+c = 50; % long semi-axis in nm
+lambda = 650; % wavelength in nm
+epsilon2 = epsAu(lambda); % dielectric function of particle
+epsilon1 = 1.33^2; % dielectric constant of embedding medium (water)
+% Incident excitation polarised along main axis
+sIncType = 'KxEz';
+
+%% Convergence parameters
+
+% Maximum multipole order for T-matrix and series expansions of fields
+N = 40;
+% Number of points for Gaussian quadratures to compute integrals in P and Q matrices
+nNbTheta = 120;
+
+
+%% Collect simulation parameters in a structure
+k1 = 2*pi/lambda * sqrt(epsilon1);
+s = sqrt(epsilon2)/sqrt(epsilon1);
+
+stParams.a=a; stParams.c=c;
+stParams.k1=k1; stParams.s=s;
+stParams.N=N; stParams.nNbTheta=nNbTheta;
+stParams.sIncType = sIncType;
+
+%% Optional control parameters
+stOptions.bGetR = false;
+stOptions.Delta = 0;
+stOptions.NB = 0; % NB will be estimated automatically
+stOptions.bGetSymmetricT = false;
+
+%% T-matrix calculation
+tic; % timer
+% Solve for T-matrix
+stC = slvForFixed(stParams, stOptions);
+% use this call instead to keep the expansion coefficients for further
+% processing
+% [stC, stAbcdnm] = slvForT(stParams,stOptions);
+
+fprintf('T-matrix (N = %d) ... done in %.f seconds.\n', N, toc);
+
+% To test for convergence and accuracy for a given set of parameters, one
+% can for example repeat the calculation with N=N+5 and nNbTheta=nNbTheta+5
+% as illustrated below
+fprintf('Convergence testing...\n');
+tic;
+stParams2=stParams;
+stParams2.N=stParams2.N+5;
+stParams2.nNbTheta=stParams2.nNbTheta+5;
+[stC2, ~] = slvForFixed(stParams2, stOptions);
+
+fprintf('\nT-matrix (N = %d) ... done in %.f seconds.\n\n', N, toc);
+fprintf('Results for a=%g, c=%g, k1=%g, s=%g+%gi, N=%d, Nt=%d\n',...
+        a, c, k1, real(s),imag(s), N, nNbTheta);
+
+fprintf('\nCross sections for fixed excitation (and estimated accuracy):\n');
+fprintf('Cext = %.20g,   relative error: %.5g\n', stC.Cext, abs(stC.Cext./stC2.Cext-1));
+fprintf('Csca = %.20g,   relative error: %.5g\n', stC.Csca, abs(stC.Csca./stC2.Csca-1));
+fprintf('Cabs = %.20g,   relative error: %.5g\n', stC.Cabs, abs(stC.Cabs./stC2.Cabs-1));
+fprintf('\nCross sections for orientation-averaged excitation (and estimated accuracy):\n');
+fprintf('<Cext> = %.20g,   relative error: %.5g\n', stC.Cextoa, abs(stC.Cextoa./stC2.Cextoa-1));
+fprintf('<Csca> = %.20g,   relative error: %.5g\n', stC.Cscaoa, abs(stC.Cscaoa./stC2.Cscaoa-1));
+fprintf('<Cabs> = %.20g,   relative error: %.5g\n', stC.Cabsoa, abs(stC.Cabsoa./stC2.Cabsoa-1));
+
+##### SOURCE END #####
+--></body></html>

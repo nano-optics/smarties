@@ -1,0 +1,561 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>ScriptTutorial</title><meta name="generator" content="MATLAB 8.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-10-12"><meta name="DC.source" content="ScriptTutorial.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>ScriptTutorial</h1><!--introduction--><p>This script provides a step-by-step tutorial to solve the scattering problem at a single wavelength, with explicit calls to the low-level functions used in the calculations of intermediate quantities. As such, this script provides a more in-depth understanding of the code than provided by the other example scripts. For a more application-oriented perspective, the "ScriptSolve" family of scripts use pre-defined functions performing the same steps internally, but invisible to the end-user.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Description</a></li><li><a href="#3">Initialization</a></li><li><a href="#4">Scatterer properties</a></li><li><a href="#8">Parameters of the scattering problem</a></li><li><a href="#9">Parameters governing convergence</a></li><li><a href="#11">Defining number of multipoles for each step</a></li><li><a href="#12">Calculation of the T-matrix</a></li><li><a href="#13">Further post-processing for well-defined orientation</a></li><li><a href="#14">Plots of the surface field</a></li></ul></div><h2>Description<a name="1"></a></h2><p>The example considers an absorbing dielectric (s=1.5+0.02i) in the shape of prolate spheroid of aspect ratio 10, and size parameter 10. The script calculate the T-matrix up to multipole order N and for all 0&lt;=m&lt;N From it various optical properties are also derived:</p><div><ul><li>Orientation-averaged extinction, scattering, and absorption   cross-sections.</li><li>Extinction, scattering, and absorption cross-sections for a given   incident field (KxEz in this example, meaning incident along x and polarized along z)</li><li>Surface fields (angular variation and surface-averaged intensity)   for a given incident field (KxEz here)</li></ul></div><h2>Initialization<a name="3"></a></h2><p>Note that you need to run InitPath in the root folder first to add required folders to the Matlab path so that functions can be called Alternatively, uncomment the following line</p><pre class="language-matlab">run(<span class="string">'..\InitPath'</span>);
+</pre><pre class="codeinput">clear <span class="string">all</span>
+close <span class="string">all</span>
+
+fprintf(<span class="string">'Initialization and finding NQ and NB...\n'</span>);
+tic; <span class="comment">% for timer</span>
+</pre><pre class="codeoutput">Initialization and finding NQ and NB...
+</pre><h2>Scatterer properties<a name="4"></a></h2><p>The following parameters should be defined:</p><div><ul><li>a: semi-axis along x,y</li><li>c: semi-axis along z</li><li>k1: wavevector in embedding medium (of refractive index nM) (k1=2*pi*nM/lambda)</li><li>s: relative refractive index (s=n_Particle / nM)</li></ul></div><p>In addition, the following parameter will be needed if field expansion coefficients and/or the cross-sections for a given fixed orientation are sought:</p><div><ul><li>stIncPar:  structure defining the incident excitation, can be obtained              from calling vshMakeIncidentParameters</li></ul></div><p>For actual field calculations (such as surface fields), we will also need</p><div><ul><li>nNbThetaPst: Number of theta's for postprocessing (must usually be                larger than nNbTheta for accurate surface averaging)</li><li>lambda:      wavelength (in free space) [in the same unit as a, c, k1^{-1}]</li><li>epsilon2:   relative dielectric constant of scatterer (possibly complex)</li><li>epsilon1:    relative dielectric constant of embedding medium (real                positive) Note that the latter three are not independent if k1 and s have been set</li></ul></div><h2>Parameters of the scattering problem<a name="8"></a></h2><p>We define parameters for a prolate spheroid</p><p><img vspace="5" hspace="5" src="../fig/schematicp.png" alt=""> </p><pre class="codeinput">h = 10; <span class="comment">% aspect ratio, h=c/a for prolate spheroids</span>
+k1 = 1; <span class="comment">% incident wavenumber k1=2pi/lambda * nM</span>
+xmax = 10; <span class="comment">% maximumum size parameter xmax= k1 * max(a,c)</span>
+<span class="comment">% From which we deduce</span>
+c = xmax / k1;
+a = c / h;
+
+epsilon2 = (1.5+0.02i)^2; <span class="comment">% dielectric constant of scatterer</span>
+epsilon1 = 1;
+lambda = 2*pi*sqrt(epsilon1)/k1;
+s = sqrt(epsilon2)/sqrt(epsilon1);
+<span class="comment">% note that only s is needed for T-matrix but other parameters are needed for E-field calculations</span>
+
+<span class="comment">% For convenience, k1 and s are stored in a struct</span>
+stk1s.k1=k1;
+stk1s.s=s;
+<span class="comment">% Incident field properties (if required)</span>
+sIncType=<span class="string">'KxEz'</span>; <span class="comment">% incident along x  and polarized along z</span>
+<span class="comment">% type  help vshMakeIncidentParameters for more options (plane wave excitation only)</span>
+</pre><h2>Parameters governing convergence<a name="9"></a></h2><p>The following parameters will be needed:</p><div><ul><li>N:        Number of multipoles required for T-matrix</li><li>abmvec:   Vector containing the values of <tt>m</tt> for which T is computed             Only m&gt;=0 is needed and m&lt;=N.             For all m, use absmvec=0:N (= [0,1,2 ..., N] )</li><li>NQ:       Number of multipoles for the P and Q matrix, NQ&gt;=N</li><li>NB:       Number of multipoles to compute the Bessel functions             in the improved algorithm, NB&gt;=NQ.</li><li>nNbTheta: Number of theta's for the Gaussian quadrature</li></ul></div><pre class="codeinput"><span class="comment">% Maximum multipole order for T-matrix and series expansions of fields</span>
+N = 50;
+<span class="comment">% m-numbers used in the calculations</span>
+<span class="comment">% For most incident excitations and for orientation-averaged properties,</span>
+<span class="comment">% all |m|&lt;=N need to be considered:</span>
+absmvec = (0:1:N)';
+<span class="comment">% Advanced users can define the stIncPar first and use the following instead</span>
+<span class="comment">% absmvec = stIncPar.absmvec.';</span>
+<span class="comment">% or specify a single m-value for testing for example, i.e.</span>
+<span class="comment">% absmvec = 1; % m=1 only</span>
+
+<span class="comment">% Number of points for Gaussian quadratures to compute integrals in P and Q matrices</span>
+<span class="comment">% By symmetry, points are only computed from that=0 to pi/2</span>
+nNbTheta = 120;
+
+<span class="comment">% Make structure describing spheroidal geometry and quadrature points for</span>
+<span class="comment">% numerical integrations</span>
+stGeometry = sphMakeGeometry(nNbTheta, a, c);
+
+<span class="comment">% Make structure with incident field parameters</span>
+stIncPar = vshMakeIncidentParameters(sIncType, N);
+</pre><h2>Defining number of multipoles for each step<a name="11"></a></h2><p>The T-matrix and corresponding field expansion coefficients will be calculated up to n=N for all m in absmvec (note that m&gt;=0).</p><pre class="codeinput"><span class="comment">% For this, we may need to calculate P and Q with more multipole,</span>
+<span class="comment">% NQ=N+Delta [see JQSRT 160, 29 (2015)].</span>
+<span class="comment">% This can ensure the accuracy of the entire T-matrix [see JQSRT 160, 29 (2015)].</span>
+<span class="comment">% Delta can be estimated from the convergence of T_{11}^{22,m=1}</span>
+<span class="comment">% with the following call (advanced users)</span>
+[Delta, T2211err]= sphEstimateDelta(stGeometry, stk1s);
+
+<span class="comment">% Alternatively one may simply use NQ = N and check convergence of the</span>
+<span class="comment">% results by running a second calculation for a larger N</span>
+<span class="comment">% [see JQSRT 160, 29 (2015)].</span>
+<span class="comment">% Delta=0;</span>
+
+NQ = N+Delta;<span class="comment">% NQ&gt;=N: Maximum multipole order for computing P and Q matrices</span>
+
+<span class="comment">% P and Q are calculated using the stable and accurate algorithm in</span>
+<span class="comment">% [JQSRT 123, 153 (2013)].</span>
+<span class="comment">% For this algorithm we need to specify how many extra order are needed</span>
+<span class="comment">% to compute Bessel function products to the highest accuracy</span>
+<span class="comment">% This can be estimated with the following function</span>
+NB=sphEstimateNB(NQ, stGeometry, stk1s);
+<span class="comment">% or can be specified by user (advanced), for example</span>
+<span class="comment">% NB=NQ;</span>
+
+fprintf(<span class="string">'\n ... done in %.g seconds.\n'</span>, toc);
+</pre><pre class="codeoutput">sphCalculatePQ: Calculating P,Q for 1 m-values with N_Q = 80, N_B = 80, N_Theta = 120
+
+ ... done in 3 seconds.
+</pre><h2>Calculation of the T-matrix<a name="12"></a></h2><p>Calculating P and Q</p><pre class="codeinput">fprintf(<span class="string">'\nMain business...\n'</span>);
+tic;
+<span class="comment">% This calculates P and Q using the algorithm of [JQSRT 123, 153 (2013)]</span>
+CstPQa = sphCalculatePQ(NQ, absmvec, stGeometry, stk1s, NB);
+<span class="comment">% CstPQa is a cell {1 x M} of structures, one for each m in absmvec. Each stPQa structure</span>
+<span class="comment">% contains structures describing P (st4MPeo, st4MPoe) and Q (st4MQeo,</span>
+<span class="comment">% st4MQoe). These make use of the reflection symmetry and do not contain</span>
+<span class="comment">% the zero elements.</span>
+
+<span class="comment">% To obtain the full matrices in standard form, use the following call</span>
+<span class="comment">% jj=2; % jj=1 corresponds to m=0, jj=2 to m=1, etc... (see absmvec definition)</span>
+jj = 1;
+[Pm, nvecP] = rvhGetFullMatrix(CstPQa{jj},<span class="string">'st4MP'</span>);
+[Qm, nvecQ] = rvhGetFullMatrix(CstPQa{jj},<span class="string">'st4MQ'</span>);
+fprintf(<span class="string">'Pm and Qm are full matrices for m=%d\n'</span>, absmvec(jj));
+<span class="comment">% nvec contains the multipole orders for each block of Pm and Qm</span>
+<span class="comment">% Note that P and Q are square matrices of dimension NQ+1-m (or NQ for m=0)</span>
+<span class="comment">% since only elements P_{nk} with n,k&gt;=m (or 1 for m=0) are needed.</span>
+<span class="comment">% Therefore for a given m, P(i,j) correspond to P_{n=i+m-1,k=j+m-1}</span>
+<span class="comment">% or P_{n=i+m,k=j+m} for m=0</span>
+
+fprintf(<span class="string">'P and Q matrices... done in %.g seconds.\n'</span>, toc);
+
+<span class="comment">% Calculating T and R</span>
+<span class="comment">%</span>
+tic;
+<span class="comment">% Get T=-PQ^{-1} and R=Q^{-1} for all m using the inversion procedures</span>
+<span class="comment">% described in [JQSRT 123, 153 (2013)].</span>
+CstTRa = rvhGetTRfromPQ(CstPQa,true);
+<span class="comment">% CstTRa has the same format as CstPQa and contains T and R matrices for</span>
+<span class="comment">% all m in absmvec</span>
+<span class="comment">% These T and R matrices go up to NQ multipoles</span>
+
+<span class="comment">% If only the T-matrix is required, use instead</span>
+<span class="comment">% CstTRa = rvhGetTRfromPQ(CstPQa,false);</span>
+
+<span class="comment">% If needed, discard higher order multipoles</span>
+<span class="comment">% (which are affected by the finite size of P and Q)</span>
+<span class="keyword">if</span> NQ&gt;N
+    CstTRa = rvhTruncateMatrices(CstTRa, N);
+ <span class="keyword">end</span>
+<span class="comment">% T and R matrices now include N multipoles</span>
+
+<span class="comment">% If required, one may symmetrize the T-matrix (this assumes that the upper</span>
+<span class="comment">% triangular parts of the matrices are correct, see JQSRT 160, 29 (2015))</span>
+CstTRa = rvhGetSymmetricMat(CstTRa, {<span class="string">'st4MT'</span>});
+
+fprintf(<span class="string">'\nT-matrix (N = %d) ... done in %.g seconds.\n'</span>, N, toc);
+
+<span class="comment">% Calculate the (Ext, Abs, Sca) orientation-averaged cross-sections</span>
+stCoa = rvhGetAverageCrossSections(k1, CstTRa);
+
+fprintf(<span class="string">'\nCross sections for orientation-averaged excitation:\n'</span>);
+fprintf(<span class="string">'&lt;Cext&gt; = %.20g\n'</span>, stCoa.Cext);
+fprintf(<span class="string">'&lt;Csca&gt; = %.20g\n'</span>, stCoa.Csca);
+fprintf(<span class="string">'&lt;Cabs&gt; = %.20g\n'</span>, stCoa.Cabs);
+</pre><pre class="codeoutput">
+Main business...
+sphCalculatePQ: Calculating P,Q for 51 m-values with N_Q = 83, N_B = 83, N_Theta = 120
+Pm and Qm are full matrices for m=0
+P and Q matrices... done in 6 seconds.
+
+T-matrix (N = 50) ... done in 0.3 seconds.
+
+Cross sections for orientation-averaged excitation:
+&lt;Cext&gt; = 18.737732166309676529
+&lt;Csca&gt; = 16.601204532914721312
+&lt;Cabs&gt; = 2.1365276333949552168
+</pre><h2>Further post-processing for well-defined orientation<a name="13"></a></h2><pre class="codeinput">fprintf(<span class="string">'\nComputing fixed orientation...\n\n'</span>);
+tic;
+<span class="comment">% For this section, it is assumed that the incident field properties are</span>
+<span class="comment">% defined in stIncPar</span>
+
+<span class="comment">% Get the field expansion coefficients from T and R for a given incident</span>
+<span class="comment">% excitation (defined earlier in stIncPar)</span>
+stAbcdnm = rvhGetFieldCoefficients(N, CstTRa, stIncPar);
+
+<span class="comment">% Calculate the (Ext, Abs, Sca) cross-sections for this excitation</span>
+stC = pstGetCrossSections(k1, stAbcdnm);
+
+format <span class="string">long</span>
+fprintf(<span class="string">'\nCross sections for fixed excitation (%s):\n'</span>, sIncType);
+fprintf(<span class="string">'Cext = %.20g\n'</span>, stC.Cext);
+fprintf(<span class="string">'Csca = %.20g\n'</span>, stC.Csca);
+fprintf(<span class="string">'Cabs = %.20g\n'</span>, stC.Cabs);
+
+<span class="comment">% For convenience this will prepare a result structure for postprocessing</span>
+stResE=pstMakeStructForField(stAbcdnm, N, lambda, epsilon2, epsilon1, stIncPar, a, c);
+
+<span class="comment">% For surface-properties, we may want to use more points to ensure finer</span>
+<span class="comment">% evaluation of the surface fields and of their averages</span>
+nNbThetaPst = 360; <span class="comment">% number of theta for evaluating fields</span>
+
+<span class="comment">% The surface fields can be caculated as</span>
+<span class="comment">% stEsurf=pstSurfaceField(stResE,nNbThetaPst);</span>
+<span class="comment">% To avoid repeated calculation of the geometry, one may also do it</span>
+<span class="comment">% separately like so:</span>
+stRtfuncPst = sphMakeGeometry(nNbThetaPst, a, c); <span class="comment">% new geometry with more points</span>
+<span class="comment">% It is also necessary to extend the range of theta over [0;pi] instead of</span>
+<span class="comment">% [0;pi/2]</span>
+stRtfuncPst=rvhGetThetasForAverage(stRtfuncPst); <span class="comment">% get thetas over entire range [0,pi]</span>
+<span class="comment">% Calculate the surface electric field E partial series expansion (for each m)</span>
+<span class="comment">% on the surface as well as average values M=|E|^2, F=|E|^4</span>
+ stEsurf=pstSurfaceField(stResE,stRtfuncPst);
+</pre><pre class="codeoutput">
+Computing fixed orientation...
+
+
+Cross sections for fixed excitation (KxEz):
+Cext = 25.506059713694384072
+Csca = 23.011763940346192214
+Cabs = 2.4942957733481918581
+</pre><h2>Plots of the surface field<a name="14"></a></h2><p>as a function of theta, for one or more values of phi</p><pre class="codeinput">phi0=[0,pi/4,pi/2];
+M = pstGetThetaDepFieldIntensity(stEsurf,phi0); <span class="comment">% [3 x T]</span>
+figure(<span class="string">'Name'</span>,<span class="string">'Theta-dependence of surface-field intensity M=|E|^2 for fixed phi'</span>);
+plot(stEsurf.theta, M);
+legend({[<span class="string">'phi='</span>, num2str(phi0(1))], <span class="keyword">...</span>
+    [<span class="string">'phi='</span>, num2str(phi0(2))], <span class="keyword">...</span>
+    [<span class="string">'phi='</span>, num2str(phi0(3))]}, <span class="keyword">...</span>
+    <span class="string">'Location'</span>, <span class="string">'Best'</span>);
+
+xlabel(<span class="string">'Theta [radians]'</span>)
+ylabel(<span class="string">'Field Intensity Enhancement Factor'</span>)
+
+<span class="comment">% 3D surface plot of the surface</span>
+<span class="comment">% field everywhere on the surface</span>
+<span class="comment">% NOTE that this requires to recompute all</span>
+<span class="comment">% the surface fields from scratch. Using 90x90 pts here:</span>
+pstPlotAllSurfaceField(90,stResE);
+
+fprintf(<span class="string">'\nPostprocessing for fixed orientation (Ntheta = %d) over [0;pi] ... done in %.g seconds.\n'</span>, <span class="keyword">...</span>
+        2*nNbThetaPst, toc);
+</pre><pre class="codeoutput">
+Postprocessing for fixed orientation (Ntheta = 720) over [0;pi] ... done in 3 seconds.
+</pre><img vspace="5" hspace="5" src="ScriptTutorial_01.png" alt=""> <img vspace="5" hspace="5" src="ScriptTutorial_02.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% ScriptTutorial
+% This script provides a step-by-step tutorial to solve the scattering
+% problem at a single wavelength, with explicit calls to the low-level
+% functions used in the calculations of intermediate quantities.
+% As such, this script provides a more in-depth understanding of the code 
+% than provided by the other example scripts. For a more application-oriented 
+% perspective, the "ScriptSolve" family of scripts use pre-defined functions 
+% performing the same steps internally, but invisible to the end-user.
+%
+
+%% Description
+%
+% The example considers an absorbing dielectric (s=1.5+0.02i) in the shape 
+% of prolate spheroid of aspect ratio 10, and size parameter 10.
+% The script calculate the T-matrix up to multipole order N and for all 0<=m<N
+% From it various optical properties are also derived:
+%%
+% * Orientation-averaged extinction, scattering, and absorption
+%   cross-sections.
+% * Extinction, scattering, and absorption cross-sections for a given
+%   incident field (KxEz in this example, meaning incident along x and polarized along z)
+% * Surface fields (angular variation and surface-averaged intensity)
+%   for a given incident field (KxEz here)
+
+%% Initialization
+%
+% Note that you need to run InitPath in the root folder first to add
+% required folders to the Matlab path so that functions can be called
+% Alternatively, uncomment the following line
+%
+%   run('..\InitPath'); 
+%
+clear all
+close all
+
+fprintf('Initialization and finding NQ and NB...\n');
+tic; % for timer
+
+
+%% Scatterer properties
+% The following parameters should be defined:
+%%
+% * a: semi-axis along x,y
+% * c: semi-axis along z
+% * k1: wavevector in embedding medium (of refractive index nM) (k1=2*pi*nM/lambda)
+% * s: relative refractive index (s=n_Particle / nM)
+%
+% In addition, the following parameter will be needed if field expansion coefficients
+% and/or the cross-sections for a given fixed orientation are sought:
+%%
+% * stIncPar:  structure defining the incident excitation, can be obtained
+%              from calling vshMakeIncidentParameters
+%
+% For actual field calculations (such as surface fields), we will also need
+%%
+% * nNbThetaPst: Number of theta's for postprocessing (must usually be
+%                larger than nNbTheta for accurate surface averaging)
+% * lambda:      wavelength (in free space) [in the same unit as a, c, k1^{-1}]
+% * epsilon2:   relative dielectric constant of scatterer (possibly complex)
+% * epsilon1:    relative dielectric constant of embedding medium (real
+%                positive)
+% Note that the latter three are not independent if k1 and s have been set
+
+
+%% Parameters of the scattering problem
+% We define parameters for a prolate spheroid
+% 
+% <<../fig/schematicp.png>>
+% 
+h = 10; % aspect ratio, h=c/a for prolate spheroids
+k1 = 1; % incident wavenumber k1=2pi/lambda * nM
+xmax = 10; % maximumum size parameter xmax= k1 * max(a,c)
+% From which we deduce
+c = xmax / k1;
+a = c / h;
+
+epsilon2 = (1.5+0.02i)^2; % dielectric constant of scatterer
+epsilon1 = 1;
+lambda = 2*pi*sqrt(epsilon1)/k1;
+s = sqrt(epsilon2)/sqrt(epsilon1);
+% note that only s is needed for T-matrix but other parameters are needed for E-field calculations
+
+% For convenience, k1 and s are stored in a struct
+stk1s.k1=k1;
+stk1s.s=s;
+% Incident field properties (if required)
+sIncType='KxEz'; % incident along x  and polarized along z
+% type  help vshMakeIncidentParameters for more options (plane wave excitation only)
+
+
+%% Parameters governing convergence
+% The following parameters will be needed:
+%%
+% * N:        Number of multipoles required for T-matrix
+% * abmvec:   Vector containing the values of |m| for which T is computed
+%             Only m>=0 is needed and m<=N.
+%             For all m, use absmvec=0:N (= [0,1,2 ..., N] )
+% * NQ:       Number of multipoles for the P and Q matrix, NQ>=N
+% * NB:       Number of multipoles to compute the Bessel functions
+%             in the improved algorithm, NB>=NQ.
+% * nNbTheta: Number of theta's for the Gaussian quadrature
+
+% Maximum multipole order for T-matrix and series expansions of fields
+N = 50;
+% m-numbers used in the calculations
+% For most incident excitations and for orientation-averaged properties,
+% all |m|<=N need to be considered:
+absmvec = (0:1:N)';
+% Advanced users can define the stIncPar first and use the following instead
+% absmvec = stIncPar.absmvec.';
+% or specify a single m-value for testing for example, i.e.
+% absmvec = 1; % m=1 only
+
+% Number of points for Gaussian quadratures to compute integrals in P and Q matrices
+% By symmetry, points are only computed from that=0 to pi/2
+nNbTheta = 120;
+
+% Make structure describing spheroidal geometry and quadrature points for
+% numerical integrations
+stGeometry = sphMakeGeometry(nNbTheta, a, c);
+
+% Make structure with incident field parameters 
+stIncPar = vshMakeIncidentParameters(sIncType, N); 
+
+
+%% Defining number of multipoles for each step
+%
+% The T-matrix and corresponding field expansion coefficients will be
+% calculated up to n=N for all m in absmvec (note that m>=0).
+
+% For this, we may need to calculate P and Q with more multipole,
+% NQ=N+Delta [see JQSRT 160, 29 (2015)].
+% This can ensure the accuracy of the entire T-matrix [see JQSRT 160, 29 (2015)].
+% Delta can be estimated from the convergence of T_{11}^{22,m=1}
+% with the following call (advanced users)
+[Delta, T2211err]= sphEstimateDelta(stGeometry, stk1s);
+
+% Alternatively one may simply use NQ = N and check convergence of the
+% results by running a second calculation for a larger N
+% [see JQSRT 160, 29 (2015)].
+% Delta=0;
+
+NQ = N+Delta;% NQ>=N: Maximum multipole order for computing P and Q matrices
+
+% P and Q are calculated using the stable and accurate algorithm in
+% [JQSRT 123, 153 (2013)].
+% For this algorithm we need to specify how many extra order are needed
+% to compute Bessel function products to the highest accuracy
+% This can be estimated with the following function
+NB=sphEstimateNB(NQ, stGeometry, stk1s);
+% or can be specified by user (advanced), for example
+% NB=NQ;
+
+fprintf('\n ... done in %.g seconds.\n', toc);
+
+%% Calculation of the T-matrix
+%
+% Calculating P and Q
+%
+fprintf('\nMain business...\n');
+tic;
+% This calculates P and Q using the algorithm of [JQSRT 123, 153 (2013)]
+CstPQa = sphCalculatePQ(NQ, absmvec, stGeometry, stk1s, NB);
+% CstPQa is a cell {1 x M} of structures, one for each m in absmvec. Each stPQa structure
+% contains structures describing P (st4MPeo, st4MPoe) and Q (st4MQeo,
+% st4MQoe). These make use of the reflection symmetry and do not contain
+% the zero elements.
+
+% To obtain the full matrices in standard form, use the following call
+% jj=2; % jj=1 corresponds to m=0, jj=2 to m=1, etc... (see absmvec definition)
+jj = 1;
+[Pm, nvecP] = rvhGetFullMatrix(CstPQa{jj},'st4MP');
+[Qm, nvecQ] = rvhGetFullMatrix(CstPQa{jj},'st4MQ');
+fprintf('Pm and Qm are full matrices for m=%d\n', absmvec(jj));
+% nvec contains the multipole orders for each block of Pm and Qm
+% Note that P and Q are square matrices of dimension NQ+1-m (or NQ for m=0)
+% since only elements P_{nk} with n,k>=m (or 1 for m=0) are needed.
+% Therefore for a given m, P(i,j) correspond to P_{n=i+m-1,k=j+m-1}
+% or P_{n=i+m,k=j+m} for m=0
+
+fprintf('P and Q matrices... done in %.g seconds.\n', toc);
+
+% Calculating T and R
+%
+tic;
+% Get T=-PQ^{-1} and R=Q^{-1} for all m using the inversion procedures
+% described in [JQSRT 123, 153 (2013)].
+CstTRa = rvhGetTRfromPQ(CstPQa,true);
+% CstTRa has the same format as CstPQa and contains T and R matrices for
+% all m in absmvec
+% These T and R matrices go up to NQ multipoles
+
+% If only the T-matrix is required, use instead
+% CstTRa = rvhGetTRfromPQ(CstPQa,false);
+
+% If needed, discard higher order multipoles
+% (which are affected by the finite size of P and Q)
+if NQ>N
+    CstTRa = rvhTruncateMatrices(CstTRa, N);
+ end
+% T and R matrices now include N multipoles
+
+% If required, one may symmetrize the T-matrix (this assumes that the upper
+% triangular parts of the matrices are correct, see JQSRT 160, 29 (2015))
+CstTRa = rvhGetSymmetricMat(CstTRa, {'st4MT'});
+
+fprintf('\nT-matrix (N = %d) ... done in %.g seconds.\n', N, toc);
+
+% Calculate the (Ext, Abs, Sca) orientation-averaged cross-sections 
+stCoa = rvhGetAverageCrossSections(k1, CstTRa);
+
+fprintf('\nCross sections for orientation-averaged excitation:\n');
+fprintf('<Cext> = %.20g\n', stCoa.Cext);
+fprintf('<Csca> = %.20g\n', stCoa.Csca);
+fprintf('<Cabs> = %.20g\n', stCoa.Cabs);
+
+
+%% Further post-processing for well-defined orientation
+%
+fprintf('\nComputing fixed orientation...\n\n');
+tic;
+% For this section, it is assumed that the incident field properties are
+% defined in stIncPar
+
+% Get the field expansion coefficients from T and R for a given incident
+% excitation (defined earlier in stIncPar)
+stAbcdnm = rvhGetFieldCoefficients(N, CstTRa, stIncPar);
+
+% Calculate the (Ext, Abs, Sca) cross-sections for this excitation
+stC = pstGetCrossSections(k1, stAbcdnm);
+
+format long
+fprintf('\nCross sections for fixed excitation (%s):\n', sIncType);
+fprintf('Cext = %.20g\n', stC.Cext);
+fprintf('Csca = %.20g\n', stC.Csca);
+fprintf('Cabs = %.20g\n', stC.Cabs);
+
+% For convenience this will prepare a result structure for postprocessing
+stResE=pstMakeStructForField(stAbcdnm, N, lambda, epsilon2, epsilon1, stIncPar, a, c);
+
+% For surface-properties, we may want to use more points to ensure finer
+% evaluation of the surface fields and of their averages
+nNbThetaPst = 360; % number of theta for evaluating fields
+
+% The surface fields can be caculated as 
+% stEsurf=pstSurfaceField(stResE,nNbThetaPst); 
+% To avoid repeated calculation of the geometry, one may also do it
+% separately like so:
+stRtfuncPst = sphMakeGeometry(nNbThetaPst, a, c); % new geometry with more points
+% It is also necessary to extend the range of theta over [0;pi] instead of
+% [0;pi/2]
+stRtfuncPst=rvhGetThetasForAverage(stRtfuncPst); % get thetas over entire range [0,pi]
+% Calculate the surface electric field E partial series expansion (for each m)
+% on the surface as well as average values M=|E|^2, F=|E|^4
+ stEsurf=pstSurfaceField(stResE,stRtfuncPst); 
+
+
+%% Plots of the surface field
+% as a function of theta, for one or more values of phi
+phi0=[0,pi/4,pi/2];
+M = pstGetThetaDepFieldIntensity(stEsurf,phi0); % [3 x T]
+figure('Name','Theta-dependence of surface-field intensity M=|E|^2 for fixed phi');
+plot(stEsurf.theta, M);
+legend({['phi=', num2str(phi0(1))], ...
+    ['phi=', num2str(phi0(2))], ...
+    ['phi=', num2str(phi0(3))]}, ...
+    'Location', 'Best');
+ 
+xlabel('Theta [radians]') 
+ylabel('Field Intensity Enhancement Factor') 
+
+% 3D surface plot of the surface
+% field everywhere on the surface 
+% NOTE that this requires to recompute all
+% the surface fields from scratch. Using 90x90 pts here:
+pstPlotAllSurfaceField(90,stResE);
+
+fprintf('\nPostprocessing for fixed orientation (Ntheta = %d) over [0;pi] ... done in %.g seconds.\n', ...
+        2*nNbThetaPst, toc);
+
+
+##### SOURCE END #####
+--></body></html>

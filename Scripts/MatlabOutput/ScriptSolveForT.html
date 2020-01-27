@@ -1,0 +1,276 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>ScriptSolveForT</title><meta name="generator" content="MATLAB 8.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-10-12"><meta name="DC.source" content="ScriptSolveForT.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>ScriptSolveForT</h1><!--introduction--><p>An example script showing how to obtain the T-matrix and the scattering matrix for random orientation for a spheroid at a single wavelength. Prints the cross-sections with accuracy estimates, saves the T-matrix elements to an external text file, and plots the theta-dependent scattering matrix elements.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Initialization</a></li><li><a href="#3">Parameters of the scattering problem</a></li><li><a href="#4">Convergence parameters</a></li><li><a href="#5">Collect simulation parameters in a structure</a></li><li><a href="#6">Solving for the T-matrix</a></li><li><a href="#7">Reshape the T-matrix to long format, and export to text file</a></li><li><a href="#8">Display orientation-averaged results</a></li><li><a href="#9">Calculate the scattering matrix, test its accuracy, and plot the results</a></li></ul></div><h2>Initialization<a name="1"></a></h2><p>Note that you need to run InitPath in the root folder first to add required folders to the Matlab path so that functions can be called Alternatively, uncomment the following line</p><pre class="language-matlab">run(<span class="string">'..\InitPath'</span>);
+</pre><p>The following parameters should be defined:</p><div><ul><li>a: semi-axis along x,y</li><li>c: semi-axis along z</li><li>k1: wavevector in embedding medium (of refractive index nM) (k1=2*pi*nM/lambda)</li><li>s: relative refractive index (s=n_Particle / nM)</li><li>N: number of multipoles for T-matrix</li><li>nNbTheta: number of thetas for quadratures</li></ul></div><pre class="codeinput">clear <span class="string">all</span>
+close <span class="string">all</span>
+</pre><h2>Parameters of the scattering problem<a name="3"></a></h2><p>We define  aspect ratio, wavenumber, and size parameter for a prolate spheroid</p><p><img vspace="5" hspace="5" src="../fig/schematicp.png" alt=""> </p><pre class="codeinput">h = 10; <span class="comment">% aspect ratio, h=c/a for prolate spheroids</span>
+s = 1.5+0.02i; <span class="comment">% relative refractive index</span>
+k1 = 1; <span class="comment">% incident wavenumber k1=2pi/lambda * nM</span>
+xmax = 10; <span class="comment">% maximum size parameter xmax= k1 * max(a,c)</span>
+<span class="comment">% ... from which we deduce</span>
+c = xmax / k1;
+a = c / h;
+</pre><h2>Convergence parameters<a name="4"></a></h2><pre class="codeinput"><span class="comment">% Maximum multipole order for T-matrix and series expansions of fields</span>
+N = 30;
+<span class="comment">% Number of points for Gaussian quadratures to compute integrals in P and Q matrices</span>
+nNbTheta = 120;
+</pre><h2>Collect simulation parameters in a structure<a name="5"></a></h2><pre class="codeinput">stParams.a=a; stParams.c=c;
+stParams.k1=k1; stParams.s=s;
+stParams.N=N; stParams.nNbTheta=nNbTheta;
+
+<span class="comment">% Optional parameters may also be defined as follows:</span>
+stOptions.bGetR = false;
+stOptions.Delta = 0;
+stOptions.NB = 0; <span class="comment">% NB will be estimated automatically</span>
+stOptions.bGetSymmetricT = false;
+</pre><h2>Solving for the T-matrix<a name="6"></a></h2><pre class="codeinput">tic;
+<span class="comment">% For the Scattering matrix, we need to keep the entire T-matrix</span>
+[stCoa, CstTRa] = slvForT(stParams, stOptions);
+
+fprintf(<span class="string">'\nT-matrix (N = %d) ... done in %.f seconds.\n'</span>, N, toc);
+
+<span class="comment">% To test for convergence and accuracy for a given set of parameters, one</span>
+<span class="comment">% can for example repeat the calculation with N=N+5 and nNbTheta=nNbTheta+5</span>
+<span class="comment">% as illustrated below</span>
+fprintf(<span class="string">'Convergence testing...\n'</span>);
+tic;
+stParams2=stParams;
+stParams2.N=stParams2.N+5;
+stParams2.nNbTheta=stParams2.nNbTheta+5;
+[stCoa2, CstTRa2] = slvForT(stParams2,stOptions);
+fprintf(<span class="string">'\nT-matrix (N = %d) ... done in %.f seconds.\n'</span>, N, toc);
+</pre><pre class="codeoutput">sphCalculatePQ: Calculating P,Q for 31 m-values with N_Q = 30, N_B = 30, N_Theta = 120
+
+T-matrix (N = 30) ... done in 1 seconds.
+Convergence testing...
+sphCalculatePQ: Calculating P,Q for 36 m-values with N_Q = 35, N_B = 35, N_Theta = 125
+
+T-matrix (N = 30) ... done in 1 seconds.
+</pre><h2>Reshape the T-matrix to long format, and export to text file<a name="7"></a></h2><pre class="codeinput">T = exportTmatrix(CstTRa, <span class="string">'Tmatrix.txt'</span>);
+</pre><h2>Display orientation-averaged results<a name="8"></a></h2><pre class="codeinput">fprintf(<span class="string">'Results for a=%g, c=%g, k1=%g, s=%g+%gi, N=%d, Nt=%d\n'</span>,<span class="keyword">...</span>
+        a, c, k1, real(s),imag(s), N, nNbTheta);
+
+fprintf(<span class="string">'\nCross sections for orientation-averaged excitation (and estimated accuracy):\n'</span>);
+fprintf(<span class="string">'&lt;Cext&gt; = %.20g,   relative error: %.2g\n'</span>, stCoa.Cext, <span class="keyword">...</span>
+    abs(stCoa.Cext./stCoa2.Cext-1));
+fprintf(<span class="string">'&lt;Csca&gt; = %.20g,   relative error: %.2g\n'</span>, stCoa.Csca, <span class="keyword">...</span>
+    abs(stCoa.Csca./stCoa2.Csca-1));
+fprintf(<span class="string">'&lt;Cabs&gt; = %.20g,   relative error: %.2g\n'</span>, stCoa.Cabs, <span class="keyword">...</span>
+    abs(stCoa.Cabs./stCoa2.Cabs-1));
+</pre><pre class="codeoutput">Results for a=1, c=10, k1=1, s=1.5+0.02i, N=30, Nt=120
+
+Cross sections for orientation-averaged excitation (and estimated accuracy):
+&lt;Cext&gt; = 18.737732166323052496,   relative error: 7.1e-13
+&lt;Csca&gt; = 16.60120453291043674,   relative error: 2.7e-13
+&lt;Cabs&gt; = 2.1365276334126157565,   relative error: 8.3e-12
+</pre><h2>Calculate the scattering matrix, test its accuracy, and plot the results<a name="9"></a></h2><pre class="codeinput">lambda=2*pi/k1; <span class="comment">% We need lambda here, so assume embedding medium is air</span>
+nNbThetaSM=360;
+tic
+stSM = pstScatteringMatrixOA(CstTRa,lambda,stCoa.Csca,nNbThetaSM);
+fprintf(<span class="string">'Scattering Matrix (N = %d) ... done in %.f seconds.\n'</span>, N, toc);
+tic
+stSM2 = pstScatteringMatrixOA(CstTRa2,lambda,stCoa2.Csca,nNbThetaSM);
+fprintf(<span class="string">'Scattering Matrix (N = %d) ... done in %.f seconds.\n'</span>, N+5, toc);
+<span class="comment">% errors in expansion coefficients alpha and beta</span>
+errRelAB = abs(stSM.AllAB./stSM2.AllAB(1:(2*N+1),:)-1);
+errAbsAB = abs(stSM.AllAB-stSM2.AllAB(1:(2*N+1),:));
+<span class="comment">% errors in angle-dependent scattering matrix elements</span>
+errRelF = abs(stSM.AllF./stSM2.AllF-1);
+errAbsF = abs(stSM.AllF-stSM2.AllF);
+
+figure(<span class="string">'Name'</span>,<span class="string">'Scattering matrix'</span>)
+plot(stSM.thetadeg,stSM.AllF(:,2:7));
+xlabel(<span class="string">'Theta [deg]'</span>)
+ylabel(<span class="string">'Scattering Matrix Element'</span>)
+legend({<span class="string">'F_{11}'</span>,<span class="string">'F{22}'</span>,<span class="string">'F{33}'</span>,<span class="string">'F{44}'</span>,<span class="string">'F{12}'</span>,<span class="string">'F{34}'</span>})
+title([<span class="string">'Maximum absolute error in F is '</span>, num2str(max(max(errAbsF)))]);
+</pre><pre class="codeoutput">Scattering Matrix (N = 30) ... done in 4 seconds.
+Scattering Matrix (N = 35) ... done in 7 seconds.
+</pre><img vspace="5" hspace="5" src="ScriptSolveForT_01.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% ScriptSolveForT
+% An example script showing how to obtain the T-matrix and
+% the scattering matrix for random orientation
+% for a spheroid at a single wavelength.
+% Prints the cross-sections with accuracy estimates, saves the T-matrix 
+% elements to an external text file, and plots the
+% theta-dependent scattering matrix elements.
+%%
+
+%% Initialization
+%
+% Note that you need to run InitPath in the root folder first to add
+% required folders to the Matlab path so that functions can be called
+% Alternatively, uncomment the following line
+%
+%   run('..\InitPath');
+%
+% The following parameters should be defined:
+%%
+% * a: semi-axis along x,y
+% * c: semi-axis along z
+% * k1: wavevector in embedding medium (of refractive index nM) (k1=2*pi*nM/lambda)
+% * s: relative refractive index (s=n_Particle / nM)
+% * N: number of multipoles for T-matrix
+% * nNbTheta: number of thetas for quadratures
+
+clear all
+close all
+
+%% Parameters of the scattering problem
+% We define  aspect ratio, wavenumber, and size parameter for a
+% prolate spheroid
+%
+% <<../fig/schematicp.png>>
+%
+h = 10; % aspect ratio, h=c/a for prolate spheroids
+s = 1.5+0.02i; % relative refractive index
+k1 = 1; % incident wavenumber k1=2pi/lambda * nM
+xmax = 10; % maximum size parameter xmax= k1 * max(a,c)
+% ... from which we deduce
+c = xmax / k1;
+a = c / h;
+
+%% Convergence parameters
+
+% Maximum multipole order for T-matrix and series expansions of fields
+N = 30;
+% Number of points for Gaussian quadratures to compute integrals in P and Q matrices
+nNbTheta = 120;
+
+%% Collect simulation parameters in a structure
+stParams.a=a; stParams.c=c;
+stParams.k1=k1; stParams.s=s;
+stParams.N=N; stParams.nNbTheta=nNbTheta;
+
+% Optional parameters may also be defined as follows:
+stOptions.bGetR = false;
+stOptions.Delta = 0;
+stOptions.NB = 0; % NB will be estimated automatically
+stOptions.bGetSymmetricT = false;
+
+%% Solving for the T-matrix
+tic;
+% For the Scattering matrix, we need to keep the entire T-matrix
+[stCoa, CstTRa] = slvForT(stParams, stOptions);
+
+fprintf('\nT-matrix (N = %d) ... done in %.f seconds.\n', N, toc);
+
+% To test for convergence and accuracy for a given set of parameters, one
+% can for example repeat the calculation with N=N+5 and nNbTheta=nNbTheta+5
+% as illustrated below
+fprintf('Convergence testing...\n');
+tic;
+stParams2=stParams;
+stParams2.N=stParams2.N+5;
+stParams2.nNbTheta=stParams2.nNbTheta+5;
+[stCoa2, CstTRa2] = slvForT(stParams2,stOptions);
+fprintf('\nT-matrix (N = %d) ... done in %.f seconds.\n', N, toc);
+
+%% Reshape the T-matrix to long format, and export to text file
+T = exportTmatrix(CstTRa, 'Tmatrix.txt');
+
+%% Display orientation-averaged results
+fprintf('Results for a=%g, c=%g, k1=%g, s=%g+%gi, N=%d, Nt=%d\n',...
+        a, c, k1, real(s),imag(s), N, nNbTheta);
+
+fprintf('\nCross sections for orientation-averaged excitation (and estimated accuracy):\n');
+fprintf('<Cext> = %.20g,   relative error: %.2g\n', stCoa.Cext, ...
+    abs(stCoa.Cext./stCoa2.Cext-1));
+fprintf('<Csca> = %.20g,   relative error: %.2g\n', stCoa.Csca, ...
+    abs(stCoa.Csca./stCoa2.Csca-1));
+fprintf('<Cabs> = %.20g,   relative error: %.2g\n', stCoa.Cabs, ...
+    abs(stCoa.Cabs./stCoa2.Cabs-1));
+
+%% Calculate the scattering matrix, test its accuracy, and plot the results
+
+lambda=2*pi/k1; % We need lambda here, so assume embedding medium is air
+nNbThetaSM=360;
+tic
+stSM = pstScatteringMatrixOA(CstTRa,lambda,stCoa.Csca,nNbThetaSM);
+fprintf('Scattering Matrix (N = %d) ... done in %.f seconds.\n', N, toc);
+tic
+stSM2 = pstScatteringMatrixOA(CstTRa2,lambda,stCoa2.Csca,nNbThetaSM);
+fprintf('Scattering Matrix (N = %d) ... done in %.f seconds.\n', N+5, toc);
+% errors in expansion coefficients alpha and beta
+errRelAB = abs(stSM.AllAB./stSM2.AllAB(1:(2*N+1),:)-1);
+errAbsAB = abs(stSM.AllAB-stSM2.AllAB(1:(2*N+1),:));
+% errors in angle-dependent scattering matrix elements
+errRelF = abs(stSM.AllF./stSM2.AllF-1);
+errAbsF = abs(stSM.AllF-stSM2.AllF);
+
+figure('Name','Scattering matrix')
+plot(stSM.thetadeg,stSM.AllF(:,2:7));
+xlabel('Theta [deg]')
+ylabel('Scattering Matrix Element')
+legend({'F_{11}','F{22}','F{33}','F{44}','F{12}','F{34}'})
+title(['Maximum absolute error in F is ', num2str(max(max(errAbsF)))]);
+
+##### SOURCE END #####
+--></body></html>
