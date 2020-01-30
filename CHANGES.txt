@@ -6,9 +6,8 @@ Change Log
 
 BUG FIX
 
-- The utility function `epsSi` wrongly returned the complex refractive index of silicon rather than its dielectric function.
+- The utility function `epsSi` wrongly returned the complex refractive index of silicon rather than its dielectric function. [reported by Konstantin Ladutenko]
 
---
 
 ## v1.1.2 (20/10/2016)
 
