@@ -1,6 +1,18 @@
 Change Log
 --------
 
+
+## v1.2 (19/03/2024)
+
+NEW
+
+- tmatrix_hdf5 utility to export T-matrices in a standard HDF5 format
+
+IMPROVEMENTS
+
+- exportTmatrix gains two output parameters, q and qp, to facilitate indexing of T-matrix elements
+
+
 ## v1.1.3 (27/01/2020)
 
 

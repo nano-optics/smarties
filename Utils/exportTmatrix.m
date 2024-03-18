@@ -1,4 +1,4 @@
-function [T] = exportTmatrix( stT, complete, out, format )
+function [T, q, qp] = exportTmatrix( stT, complete, out, format )
 %% exportTmatrix
 % Reshaping to long format and exporting T-matrix entries to a text file
 %
@@ -117,9 +117,17 @@ end
 
 T = sortrows(T, 1:6);
 % [vecs vecsp vecn vecnp vecm vecmp vectr vecti];
-vecp = p_index(T(:,3), T(:,5)); % n, m -> p 
+% vecp = p_index(T(:,3), T(:,5)); % n, m -> p 
 % vecpp = p_index(T(:,4), T(:,6));
 % T = [vecp vecpp T];
+
+% p = p_index(T(:,3), T(:,5));
+% pp = p_index(T(:,4), T(:,6));
+
+Lmax = max(T(:,3));
+ 
+q = lms_index(T(:,3), T(:,5),T(:,1),Lmax);
+qp = lms_index(T(:,4), T(:,6),T(:,2),Lmax);
 
 
 % write to a file
@@ -205,7 +213,16 @@ M(Nm+ind2,Nm+ind2) = st4M.M22;
 end
 
 
-function [out1] = p_index(in1,in2)
+function [p] = p_index(l,m)
 % (n,m) -> p = n * (n+1) + m
-out1 = in1 .* (in1 + 1) + in2;
+p = l .* (l + 1) + m;
+end
+
+function [q] = lms_index(l,m,s,lmax)
+
+% (l,m) -> p = l * (l+1) + m
+p = p_index(l,m);
+pmax = lmax*(lmax+1)+lmax;
+% 𝑙(𝑞,𝑝)=(𝑞−1)𝑝𝑚𝑎𝑥+𝑝
+q = (s-1) * pmax + p;
 end
