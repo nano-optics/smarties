@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+title: SMARTIES
+message: 'If you use this software, please cite it as below.'
+type: software
+authors:
+  - given-names: Walter
+    family-names: Somerville
+    orcid: 'https://orcid.org/0000-0002-9965-4324'
+  - family-names: Auguié
+    given-names: Baptiste
+    orcid: 'https://orcid.org/0000-0002-2749-5715'
+  - family-names: Le Ru
+    given-names: Eric
+    orcid: 'https://orcid.org/0000-0002-3052-9947'
+repository-code: 'https://github.com/nano-optics/smarties/'
+url: >-
+  https://www.wgtn.ac.nz/scps/research/research-groups/raman-lab/numerical-tools/smarties
+abstract: >-
+  SMARTIES (Spheroids Modelled Accurately with a Robust
+  T-matrix Implementation for Electromagnetic Scattering) is
+  a suite of Matlab codes for the calculation of the optical
+  properties of oblate and prolate spheroidal particles,
+  with comparable capabilities and ease-of-use as Mie theory
+  for spheres.
+license: CC-BY-NC-4.0
+version: 1.2.0
+date-released: '2024-07-09'
+doi: 10.5281/zenodo.1234
