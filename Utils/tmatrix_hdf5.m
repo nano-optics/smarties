@@ -81,7 +81,7 @@ h5write(f,'/computation/files/script', script)
 
 % root attributes
 h5writeatt(f, '/', 'name', comments.name);
-h5writeatt(f, '/', 'storage_format_version', 'v0.01'); 
+h5writeatt(f, '/', 'storage_format_version', 'v1'); 
 h5writeatt(f, '/','description', comments.description);
 h5writeatt(f, '/','keywords', comments.keywords);
 
